@@ -121,56 +121,59 @@ def callback():
 
 
 
-@handler.add(MessageEvent, message=TextMessage)
+@handler.add(MessageEvent,message=TextMessage)
 def handle_message(event):
     print("收到訊息:", event.message.text)
-    user_message = event.message.text
-
+    user_message=event.message.text
+    
     try:
-        birthday_month, birthday_day = map(int, user_message.split("/"))
+        birthday_month,birthday_day=map(int,user_message.split("/"))
+        
         print(f"您的生日是: {birthday_month}/{birthday_day}")  # 確認生日解析結果
 
     except ValueError:
         print("Invalid birthday format")
-        line_bot_api.reply_message(event.reply_token, TextSendMessage(text="請輸入正確的生日格式"))
-        return
+        line_bot_api.reply_message(event.reply_token,TextSendMessage(text="請輸入正確的生日格式"))
 
-    user_zodiac = None
+        return  
+
+    user_zodiac=None
     for zodiac, (start, end) in Constellation_date.items():
         start_month, start_day = start
-        end_month, end_day = end
+    end_month, end_day = end
 
-        # 正常處理同年內的星座匹配
-        if start_month <= birthday_month <= end_month:
+    # 處理星座日期範圍的邏輯
+    if start_month < end_month:  # 星座在同一年內
+        if start_month < birthday_month < end_month or \
+           (birthday_month == start_month and birthday_day >= start_day) or \
+           (birthday_month == end_month and birthday_day <= end_day):
+            user_zodiac = zodiac
+            break
+    
+    else:  # 星座橫跨年底
+        if birthday_month >= start_month or birthday_month <= end_month:
             if (birthday_month == start_month and birthday_day >= start_day) or \
                (birthday_month == end_month and birthday_day <= end_day) or \
                (start_month < birthday_month < end_month):
-                user_zodiac = zodiac
-                break
-        # 跨年星座的處理 (例如摩羯座 12月22日到1月19日)
-        elif start_month > end_month:
-            if birthday_month >= start_month or birthday_month <= end_month:
-                if (birthday_month == start_month and birthday_day >= start_day) or \
-                   (birthday_month == end_month and birthday_day <= end_day) or \
-                   (start_month < birthday_month < end_month):
-                    user_zodiac = zodiac
-                    break
-
+               user_zodiac = zodiac
+               break
+    
+    
     if user_zodiac:
         print(f"User zodiac found:{user_zodiac}")
-        shingzuoyunshi = get_horoscope()
+        shingzuoyunshi=get_horoscope()
+
         print(f"運勢數據:{shingzuoyunshi}")
 
-        response_message = f"您的星座是:{user_zodiac}\n"
-        response_message += f"事業運勢:{shingzuoyunshi['career_coss']}分-{shingzuoyunshi['career']}\n"
-        response_message += f"感情運勢:{shingzuoyunshi['love_coss']}分-{shingzuoyunshi['love']}\n"
-        response_message += f"財運運勢:{shingzuoyunshi['wealth_coss']}分-{shingzuoyunshi['wealth']}\n"
-        response_message += f"今天總體運勢:{shingzuoyunshi['total_point']}"
+        response_message=f"您的星座是:{user_zodiac}\n"
+        response_message+=f"事業運勢:{shingzuoyunshi['career_coss']}分-{shingzuoyunshi['career']}\n"
+        response_message+=f"感情運勢:{shingzuoyunshi['love_coss']}分-{shingzuoyunshi['love']}\n"
+        response_message+=f"財運運勢:{shingzuoyunshi['wealth_coss']}分-{shingzuoyunshi['wealth']}\n"
+        response_message+=f"今天總體運勢:{shingzuoyunshi['total_point']}"
 
-        line_bot_api.reply_message(event.reply_token, TextSendMessage(text=response_message))
+        line_bot_api.reply_message(event.reply_token,TextSendMessage(text=response_message))
         print(f"Sending response: {response_message}")
     else:
         print("Zodiac not found")
-        line_bot_api.reply_message(event.reply_token, TextSendMessage(text="無法匹配您的星座，請檢查日期"))    
-
-  
+        line_bot_api.reply_message(event.reply_token, TextSendMessage(text="無法匹配您的星座，請檢查日期"))
+        return    
