@@ -138,25 +138,18 @@ def handle_message(event):
         return  
 
     user_zodiac=None
-    for zodiac, (start, end) in Constellation_date.items():
-        start_month, start_day = start
-    end_month, end_day = end
+    for zodiac,(start,end) in Constellation_date.items():
+        start_month,start_day=start
+        end_month,end_day=end
 
-    # 處理星座日期範圍的邏輯
-    if start_month < end_month:  # 星座在同一年內
-        if start_month < birthday_month < end_month or \
-           (birthday_month == start_month and birthday_day >= start_day) or \
-           (birthday_month == end_month and birthday_day <= end_day):
-            user_zodiac = zodiac
-            break
-    
-    else:  # 星座橫跨年底
-        if birthday_month >= start_month or birthday_month <= end_month:
-            if (birthday_month == start_month and birthday_day >= start_day) or \
-               (birthday_month == end_month and birthday_day <= end_day) or \
-               (start_month < birthday_month < end_month):
-               user_zodiac = zodiac
-               break
+        print(f"Checking zodiac:{zodiac},start:{start},end:{end}")
+        
+
+        if(birthday_month>start_month or (birthday_month==start_month and birthday_day>=start_day)) and\
+          (birthday_month<end_month or(birthday_month==end_month and birthday_day<=end_day)):
+           user_zodiac=zodiac
+           print(f"Matched zodiac: {user_zodiac}")
+           break
     
     
     if user_zodiac:
@@ -175,8 +168,21 @@ def handle_message(event):
         print(f"Sending response: {response_message}")
     else:
         print("Zodiac not found")
-        line_bot_api.reply_message(event.reply_token, TextSendMessage(text="無法匹配您的星座，請檢查日期"))
-        return    
+        line_bot_api.reply_message(event.reply_token, TextSendMessage(text="無法匹配您的星座，請檢查日期"))    
 
 
-    line_bot_api.reply_message(event.reply_token,TextSendMessage(text=response_message))   
+    line_bot_api.reply_message(event.reply_token,TextSendMessage(text=response_message))
+
+
+
+
+    
+
+
+
+
+
+
+
+
+
