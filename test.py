@@ -128,7 +128,7 @@ def handle_message(event):
     print(f"Received message: {user_message}")
     
     try:
-        birthday_month,birthday_day=map(int,user_message.split("/"))
+        birthday_month,birthday_day=map(int,user_message.split(""))
 
         if birthday_month < 1 or birthday_month > 12:
             raise ValueError("月份不在 1-12 範圍內")
