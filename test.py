@@ -124,7 +124,6 @@ def callback():
 @handler.add(MessageEvent,message=TextMessage)
 def handle_message(event):
     user_message=event.message.text
-    today=datetime.today()
     
     try:
         birthday_month,birthday_day=map(int,user_message.split("/"))
@@ -163,17 +162,3 @@ def handle_message(event):
 
 
     line_bot_api.reply_message(event.reply_token,TextSendMessage(text=response_message))
-
-
-
-
-    
-
-
-
-
-
-
-
-
-
