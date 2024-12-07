@@ -25,7 +25,7 @@ Constellation_date = {
     "雙魚座": ((2, 19), (3, 20)),
 }
 
-# 星座運勢
+# 星座運勢模擬
 def get_horoscope():
     career_coss = random.randint(1, 10)
     love_coss = random.randint(1, 10)
@@ -44,12 +44,9 @@ def get_horoscope():
         10: "超棒的啦"
     }
 
-    love_point = career_point
-    wealth_point = career_point
-    
     career = career_point[career_coss]
-    love = love_point[love_coss]
-    wealth = wealth_point[wealth_coss]
+    love = career_point[love_coss]
+    wealth = career_point[wealth_coss]
 
     total_coss = (career_coss + love_coss + wealth_coss) // 3
     if total_coss <= 3:
@@ -74,24 +71,19 @@ def get_horoscope():
 def callback():
     signature = request.headers["X-Line-Signature"]
     body = request.get_data(as_text=True)
-    print(f"Received body: {body}")
     try:
         handler.handle(body, signature)
     except Exception as e:
-        print(f"Error handling the request: {e}")
         abort(400)
     return "OK"
 
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
-    print("收到訊息:", event.message.text)
     user_message = event.message.text
-
     try:
+        # 處理用戶的生日
         birthday_month, birthday_day = map(int, user_message.split("/"))
-        print(f"您的生日是: {birthday_month}/{birthday_day}")  # 確認生日解析結果
     except ValueError:
-        # 如果格式錯誤，回覆提示訊息
         line_bot_api.reply_message(event.reply_token, TextSendMessage(text="請輸入正確的生日格式 (MM/DD)"))
         return  
 
@@ -102,14 +94,17 @@ def handle_message(event):
         start_month, start_day = start
         end_month, end_day = end
 
-        if (start_month < birthday_month < end_month) or (birthday_month == start_month and birthday_day >= start_day) or (birthday_month == end_month and birthday_day <= end_day):
+        # 判斷生日是否在此星座範圍內
+        if (start_month < birthday_month < end_month) or \
+           (birthday_month == start_month and birthday_day >= start_day) or \
+           (birthday_month == end_month and birthday_day <= end_day):
             user_zodiac = zodiac
             break
 
     if user_zodiac:
-        print(f"User zodiac found:{user_zodiac}")
         horoscope = get_horoscope()
 
+        # 構建回應訊息
         response_message = f"您的星座是:{user_zodiac}\n"
         response_message += f"事業運勢:{horoscope['career_coss']}分-{horoscope['career']}\n"
         response_message += f"感情運勢:{horoscope['love_coss']}分-{horoscope['love']}\n"
@@ -117,9 +112,7 @@ def handle_message(event):
         response_message += f"今天總體運勢:{horoscope['total_point']}"
 
         line_bot_api.reply_message(event.reply_token, TextSendMessage(text=response_message))
-        print(f"Sending response: {response_message}")
     else:
-        print("Zodiac not found")
         line_bot_api.reply_message(event.reply_token, TextSendMessage(text="無法匹配您的星座，請檢查日期"))
 
 if __name__ == "__main__":
