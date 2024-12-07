@@ -123,10 +123,20 @@ def callback():
 
 @handler.add(MessageEvent,message=TextMessage)
 def handle_message(event):
+    print("收到訊息:", event.message.text)
     user_message=event.message.text
+    print(f"Received message: {user_message}")
     
     try:
         birthday_month,birthday_day=map(int,user_message.split("/"))
+
+        if birthday_month < 1 or birthday_month > 12:
+            raise ValueError("月份不在 1-12 範圍內")
+        if birthday_day < 1 or birthday_day > 31:
+            raise ValueError("日期不在 1-31 範圍內")
+        
+        print(f"Parsed birthday: {birthday_month}/{birthday_day}")  # 確認生日解析結果
+
     except ValueError:
         print("Invalid birthday format")
         line_bot_api.reply_message(event.reply_token,TextSendMessage(text="請輸入正確的生日格式"))
@@ -144,12 +154,17 @@ def handle_message(event):
         if(birthday_month>start_month or (birthday_month==start_month and birthday_day>=start_day)) and\
           (birthday_month<end_month or(birthday_month==end_month and birthday_day<=end_day)):
            user_zodiac=zodiac
+           print(f"Matched zodiac: {user_zodiac}")
            break
+    
+    
     if user_zodiac:
+        print(f"User zodiac found: {user_zodiac}")
         shingzuoyunshi=get_horoscope()
+
+        print(f"Horoscope data: {shingzuoyunshi}")
         
         print(f"User zodiac: {user_zodiac}")
-        print(f"Horoscope data: {shingzuoyunshi}")
 
         response_message=f"您的星座是:{user_zodiac}\n"
         response_message+=f"事業運勢:{shingzuoyunshi['career_coss']}分-{shingzuoyunshi['career']}\n"
