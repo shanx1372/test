@@ -153,6 +153,9 @@ def handle_message(event):
     if user_zodiac:
         shingzuoyunshi=get_horoscope()
         
+        print(f"User zodiac: {user_zodiac}")
+        print(f"Horoscope data: {shingzuoyunshi}")
+
         response_message=f"您的星座是:{user_zodiac}\n"
         response_message+=f"事業運勢:{shingzuoyunshi['career_coss']}分-{shingzuoyunshi['career']}\n"
         response_message+=f"感情運勢:{shingzuoyunshi['love_coss']}分-{shingzuoyunshi['love']}\n"
@@ -164,17 +167,3 @@ def handle_message(event):
 
 
     line_bot_api.reply_message(event.reply_token,TextSendMessage(text=response_message))
-
-
-
-
-    
-
-
-
-
-
-
-
-
-
