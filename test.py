@@ -123,15 +123,11 @@ def callback():
 
 @handler.add(MessageEvent,message=TextMessage)
 def handle_message(event):
-    print("收到訊息:", event.message.text)
     user_message=event.message.text
-    print(f"Received message: {user_message}")
     today=datetime.today()
-    user_month=today.month
-    user_day=today.day
     
     try:
-        birthday_month,birthday_day=map(int,user_message.split(""))
+        birthday_month,birthday_day=map(int,user_message.split("/"))
     except ValueError:
         print("Invalid birthday format")
         line_bot_api.reply_message(event.reply_token,TextSendMessage(text="請輸入正確的生日格式"))
@@ -167,3 +163,17 @@ def handle_message(event):
 
 
     line_bot_api.reply_message(event.reply_token,TextSendMessage(text=response_message))
+
+
+
+
+    
+
+
+
+
+
+
+
+
+
