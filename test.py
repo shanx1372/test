@@ -6,8 +6,8 @@ import random
 app = Flask(__name__)
 
 # 設定 LineBot API
-line_bot_api = LineBotApi("Your_Channel_Access_Token")
-handler = WebhookHandler("Your_Channel_Secret")
+line_bot_api = LineBotApi("HeY7xErJxPUD2+UrUyfikjhpi5XsB6rykrc06AwGheydfuCkjQQ6IjbJi60g/WamRk2DHX+0Sk18MLKwD1+anucjjVDDdjSHK4EfMNqv/Tn4eCOn2/zsy0heZod+FqdbAhiXoI95VuoBSnbsKKmvAgdB04t89/1O/w1cDnyilFU=")
+handler = WebhookHandler("84678552c0bbd4a3026ee16c8cb8d4a7")
 
 # 星座日期對應（包含跨年處理）
 Constellation_date = {
