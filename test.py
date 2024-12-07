@@ -142,14 +142,23 @@ def handle_message(event):
         start_month,start_day=start
         end_month,end_day=end
 
-        print(f"Checking zodiac:{zodiac},start:{start},end:{end}")
-        
-
-        if(birthday_month>start_month or (birthday_month==start_month and birthday_day>=start_day)) and\
-          (birthday_month<end_month or(birthday_month==end_month and birthday_day<=end_day)):
-           user_zodiac=zodiac
-           print(f"Matched zodiac: {user_zodiac}")
-           break
+        if start_month<=birthday_month<=end_month:
+            if start_month==birthday_month and birthday_day>=start_day:
+                user_zodiac=zodiac
+                break
+            elif end_month==birthday_month and birthday_day<=end_day:
+                user_zodiac=zodiac
+                break
+            elif start_month<birthday_month<end_month:
+                user_zodiac=zodiac
+                break
+        elif start_month>end_month:
+         if birthday_month>=start_month or birthday_month<=end_month:
+            if(birthday_month==start_month and birthday_day>=start_day) or\
+              (birthday_month==end_month and birthday_day<=end_day) or\
+              (start_month<birthday_month<end_month):
+              user_zodiac=zodiac
+              break
     
     
     if user_zodiac:
@@ -169,6 +178,3 @@ def handle_message(event):
     else:
         print("Zodiac not found")
         line_bot_api.reply_message(event.reply_token, TextSendMessage(text="無法匹配您的星座，請檢查日期"))    
-
-
-    line_bot_api.reply_message(event.reply_token,TextSendMessage(text=response_message))
