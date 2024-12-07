@@ -14,7 +14,7 @@ def home():
     return 'Hello, World!'  # 訪問首頁時顯示 Hello, World!
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True,host='0.0.0.0',port=5000)
 #---------------------------------------------------------------------
 #匯入聯動ID
 line_bot_api=LineBotApi("HeY7xErJxPUD2+UrUyfikjhpi5XsB6rykrc06AwGheydfuCkjQQ6IjbJi60g/WamRk2DHX+0Sk18MLKwD1+anucjjVDDdjSHK4EfMNqv/Tn4eCOn2/zsy0heZod+FqdbAhiXoI95VuoBSnbsKKmvAgdB04t89/1O/w1cDnyilFU=")
@@ -142,6 +142,10 @@ def handle_message(event):
     for zodiac,(start,end) in Constellation_date.items():
         start_month,start_day=start
         end_month,end_day=end
+
+        print(f"Checking zodiac: {zodiac}, start: {start}, end: {end}")
+        print(f"User birthday: {birthday_month}/{birthday_day}")
+
         if(birthday_month>start_month or (birthday_month==start_month and birthday_day>=start_day)) and\
           (birthday_month<end_month or(birthday_month==end_month and birthday_day<=end_day)):
            user_zodiac=zodiac
@@ -158,7 +162,19 @@ def handle_message(event):
     else:
         print("Zodiac not found")    
 
-print(f"Checking zodiac: {zodiac}, start: {start}, end: {end}")
-print(f"User birthday: {birthday_month}/{birthday_day}")
-    
+
     line_bot_api.reply_message(event.reply_token,TextSendMessage(text=response_message))
+
+
+
+
+    
+
+
+
+
+
+
+
+
+
