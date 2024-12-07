@@ -125,17 +125,11 @@ def callback():
 def handle_message(event):
     print("收到訊息:", event.message.text)
     user_message=event.message.text
-    print(f"Received message: {user_message}")
     
     try:
-        birthday_month,birthday_day=map(int,user_message.split(""))
-
-        if birthday_month < 1 or birthday_month > 12:
-            raise ValueError("月份不在 1-12 範圍內")
-        if birthday_day < 1 or birthday_day > 31:
-            raise ValueError("日期不在 1-31 範圍內")
+        birthday_month,birthday_day=map(int,user_message.split("/"))
         
-        print(f"Parsed birthday: {birthday_month}/{birthday_day}")  # 確認生日解析結果
+        print(f"您的生日是: {birthday_month}/{birthday_day}")  # 確認生日解析結果
 
     except ValueError:
         print("Invalid birthday format")
@@ -148,8 +142,8 @@ def handle_message(event):
         start_month,start_day=start
         end_month,end_day=end
 
-        print(f"Checking zodiac: {zodiac}, start: {start}, end: {end}")
-        print(f"User birthday: {birthday_month}/{birthday_day}")
+        print(f"Checking zodiac:{zodiac},start:{start},end:{end}")
+        
 
         if(birthday_month>start_month or (birthday_month==start_month and birthday_day>=start_day)) and\
           (birthday_month<end_month or(birthday_month==end_month and birthday_day<=end_day)):
@@ -159,21 +153,19 @@ def handle_message(event):
     
     
     if user_zodiac:
-        print(f"User zodiac found: {user_zodiac}")
+        print(f"User zodiac found:{user_zodiac}")
         shingzuoyunshi=get_horoscope()
 
-        print(f"Horoscope data: {shingzuoyunshi}")
-        
-        print(f"User zodiac: {user_zodiac}")
+        print(f"運勢數據:{shingzuoyunshi}")
 
         response_message=f"您的星座是:{user_zodiac}\n"
         response_message+=f"事業運勢:{shingzuoyunshi['career_coss']}分-{shingzuoyunshi['career']}\n"
         response_message+=f"感情運勢:{shingzuoyunshi['love_coss']}分-{shingzuoyunshi['love']}\n"
         response_message+=f"財運運勢:{shingzuoyunshi['wealth_coss']}分-{shingzuoyunshi['wealth']}\n"
         response_message+=f"今天總體運勢:{shingzuoyunshi['total_point']}"
+
+        line_bot_api.reply_message(event.reply_token,TextSendMessage(text=response_message))
         print(f"Sending response: {response_message}")
     else:
-        print("Zodiac not found")    
-
-
-    line_bot_api.reply_message(event.reply_token,TextSendMessage(text=response_message))
+        print("Zodiac not found")
+        line_bot_api.reply_message(event.reply_token, TextSendMessage(text="無法匹配您的星座，請檢查日期"))    
