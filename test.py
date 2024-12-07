@@ -127,7 +127,7 @@ def handle_message(event):
     today=datetime.today()
     
     try:
-        birthday_month,birthday_day=map(int,user_message.split("/"))
+        birthday_month,birthday_day=map(int,user_message.split('/'))
     except ValueError:
         print("Invalid birthday format")
         line_bot_api.reply_message(event.reply_token,TextSendMessage(text="請輸入正確的生日格式"))
