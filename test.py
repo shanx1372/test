@@ -111,9 +111,11 @@ def get_horoscope():
 def callback():
     signature=request.headers["X-Line-Signature"]
     body=request.get_data(as_text=True)
+    print(f"Received body: {body}")
     try:
         handler.handle(body,signature)
     except Exception as e:
+        print(f"Error handling the request: {e}")
         abort(400)
     return"OK"        
 
@@ -121,7 +123,9 @@ def callback():
 
 @handler.add(MessageEvent,message=TextMessage)
 def handle_message(event):
+    print("收到訊息:", event.message.text)
     user_message=event.message.text
+    print(f"Received message: {user_message}")
     today=datetime.today()
     user_month=today.month
     user_day=today.day
@@ -129,6 +133,7 @@ def handle_message(event):
     try:
         birthday_month,birthday_day=map(int,user_message.split("/"))
     except ValueError:
+        print("Invalid birthday format")
         line_bot_api.reply_message(event.reply_token,TextSendMessage(text="請輸入正確的生日格式"))
 
         return  
@@ -149,6 +154,9 @@ def handle_message(event):
         response_message+=f"感情運勢:{shingzuoyunshi['love_coss']}分-{shingzuoyunshi['love']}\n"
         response_message+=f"財運運勢:{shingzuoyunshi['wealth_coss']}分-{shingzuoyunshi['wealth']}\n"
         response_message+=f"今天總體運勢:{shingzuoyunshi['total_point']}"
+        print(f"Sending response: {response_message}")
+    else:
+        print("Zodiac not found")    
 
 
     line_bot_api.reply_message(event.reply_token,TextSendMessage(text=response_message))
