@@ -151,9 +151,9 @@ def handle_message(event):
                 break
         # 處理跨年星座（如摩羯座）
         else:
-            if (birthday_month > start_month or birthday_month < end_month) or \
-               (birthday_month == start_month and birthday_day >= start_day) or \
-               (birthday_month == end_month and birthday_day <= end_day):
+            if (birthday_month == start_month and birthday_day >= start_day) or \
+               (birthday_month == end_month and birthday_day <= end_day) or \
+               (birthday_month > start_month or birthday_month < end_month):
                 user_zodiac = zodiac
                 break
 
@@ -167,7 +167,7 @@ def handle_message(event):
         response_message += f"財運運勢:{shingzuoyunshi['wealth_coss']}分-{shingzuoyunshi['wealth']}\n"
         response_message += f"今天總體運勢:{shingzuoyunshi['total_point']}"
 
-        
+        line_bot_api.reply_message(event.reply_token, TextSendMessage(text=response_message))
         print(f"Sending response: {response_message}")
     else:
         print("Zodiac not found")
