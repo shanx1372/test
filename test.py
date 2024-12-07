@@ -158,5 +158,7 @@ def handle_message(event):
     else:
         print("Zodiac not found")    
 
-
+print(f"Checking zodiac: {zodiac}, start: {start}, end: {end}")
+print(f"User birthday: {birthday_month}/{birthday_day}")
+    
     line_bot_api.reply_message(event.reply_token,TextSendMessage(text=response_message))
