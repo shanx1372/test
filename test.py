@@ -178,3 +178,6 @@ def handle_message(event):
     else:
         print("Zodiac not found")
         line_bot_api.reply_message(event.reply_token, TextSendMessage(text="無法匹配您的星座，請檢查日期"))    
+
+
+    line_bot_api.reply_message(event.reply_token,TextSendMessage(text=response_message))   
