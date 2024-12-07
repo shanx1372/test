@@ -7,6 +7,14 @@ import random
 
 
 app=Flask(__name__)
+
+
+@app.route('/')
+def home():
+    return 'Hello, World!'  # 訪問首頁時顯示 Hello, World!
+
+if __name__ == "__main__":
+    app.run(debug=True)
 #---------------------------------------------------------------------
 #匯入聯動ID
 line_bot_api=LineBotApi("HeY7xErJxPUD2+UrUyfikjhpi5XsB6rykrc06AwGheydfuCkjQQ6IjbJi60g/WamRk2DHX+0Sk18MLKwD1+anucjjVDDdjSHK4EfMNqv/Tn4eCOn2/zsy0heZod+FqdbAhiXoI95VuoBSnbsKKmvAgdB04t89/1O/w1cDnyilFU=")
@@ -144,17 +152,3 @@ def handle_message(event):
 
 
     line_bot_api.reply_message(event.reply_token,TextSendMessage(text=response_message))
-
-
-
-
-    
-
-
-
-
-
-
-
-
-
