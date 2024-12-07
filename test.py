@@ -121,59 +121,52 @@ def callback():
 
 
 
-@handler.add(MessageEvent,message=TextMessage)
+@handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
     print("收到訊息:", event.message.text)
-    user_message=event.message.text
-    
-    try:
-        birthday_month,birthday_day=map(int,user_message.split("/"))
-        
-        print(f"您的生日是: {birthday_month}/{birthday_day}")  # 確認生日解析結果
+    user_message = event.message.text
 
+    # 解析生日
+    try:
+        birthday_month, birthday_day = map(int, user_message.split("/"))
+        print(f"您的生日是: {birthday_month}/{birthday_day}")  # 確認生日解析結果
     except ValueError:
         print("Invalid birthday format")
-        line_bot_api.reply_message(event.reply_token,TextSendMessage(text="請輸入正確的生日格式"))
-
+        line_bot_api.reply_message(event.reply_token, TextSendMessage(text="請輸入正確的生日格式"))
         return  
 
-    user_zodiac=None
-    for zodiac,(start,end) in Constellation_date.items():
-        start_month,start_day=start
-        end_month,end_day=end
+    user_zodiac = None
+    for zodiac, (start, end) in Constellation_date.items():
+        start_month, start_day = start
+        end_month, end_day = end
 
-        if start_month<=birthday_month<=end_month:
-            if start_month==birthday_month and birthday_day>=start_day:
-                user_zodiac=zodiac
+        print(f"Checking zodiac: {zodiac}, start: {start}, end: {end}")
+
+        # 處理跨年星座（如摩羯座，12月22日至1月19日）
+        if start_month <= end_month:  # 非跨年情況
+            if start_month < birthday_month < end_month or \
+                    (birthday_month == start_month and birthday_day >= start_day) or \
+                    (birthday_month == end_month and birthday_day <= end_day):
+                user_zodiac = zodiac
                 break
-            elif end_month==birthday_month and birthday_day<=end_day:
-                user_zodiac=zodiac
+        else:  # 跨年情況
+            if (birthday_month >= start_month or birthday_month <= end_month) and \
+                    (birthday_day >= start_day if birthday_month == start_month else True) and \
+                    (birthday_day <= end_day if birthday_month == end_month else True):
+                user_zodiac = zodiac
                 break
-            elif start_month<birthday_month<end_month:
-                user_zodiac=zodiac
-                break
-        elif start_month>end_month:
-         if birthday_month>=start_month or birthday_month<=end_month:
-            if(birthday_month==start_month and birthday_day>=start_day) or\
-              (birthday_month==end_month and birthday_day<=end_day) or\
-              (start_month<birthday_month<end_month):
-              user_zodiac=zodiac
-              break
-    
     
     if user_zodiac:
-        print(f"User zodiac found:{user_zodiac}")
-        shingzuoyunshi=get_horoscope()
+        print(f"User zodiac found: {user_zodiac}")
+        shingzuoyunshi = get_horoscope()
 
-        print(f"運勢數據:{shingzuoyunshi}")
+        response_message = f"您的星座是:{user_zodiac}\n"
+        response_message += f"事業運勢:{shingzuoyunshi['career_coss']}分-{shingzuoyunshi['career']}\n"
+        response_message += f"感情運勢:{shingzuoyunshi['love_coss']}分-{shingzuoyunshi['love']}\n"
+        response_message += f"財運運勢:{shingzuoyunshi['wealth_coss']}分-{shingzuoyunshi['wealth']}\n"
+        response_message += f"今天總體運勢:{shingzuoyunshi['total_point']}"
 
-        response_message=f"您的星座是:{user_zodiac}\n"
-        response_message+=f"事業運勢:{shingzuoyunshi['career_coss']}分-{shingzuoyunshi['career']}\n"
-        response_message+=f"感情運勢:{shingzuoyunshi['love_coss']}分-{shingzuoyunshi['love']}\n"
-        response_message+=f"財運運勢:{shingzuoyunshi['wealth_coss']}分-{shingzuoyunshi['wealth']}\n"
-        response_message+=f"今天總體運勢:{shingzuoyunshi['total_point']}"
-
-        line_bot_api.reply_message(event.reply_token,TextSendMessage(text=response_message))
+        line_bot_api.reply_message(event.reply_token, TextSendMessage(text=response_message))
         print(f"Sending response: {response_message}")
     else:
         print("Zodiac not found")
