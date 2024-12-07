@@ -142,20 +142,21 @@ def handle_message(event):
 
         print(f"Checking zodiac: {zodiac}, start: {start}, end: {end}")
 
-        # 處理跨年星座（如摩羯座，12月22日至1月19日）
-        if start_month <= end_month:  # 非跨年情況
-            if start_month < birthday_month < end_month or \
-                    (birthday_month == start_month and birthday_day >= start_day) or \
-                    (birthday_month == end_month and birthday_day <= end_day):
+        # 處理非跨年星座（如雙子座）
+        if start_month < end_month:
+            if (start_month < birthday_month < end_month) or \
+               (birthday_month == start_month and birthday_day >= start_day) or \
+               (birthday_month == end_month and birthday_day <= end_day):
                 user_zodiac = zodiac
                 break
-        else:  # 跨年情況
-            if (birthday_month >= start_month or birthday_month <= end_month) and \
-                    (birthday_day >= start_day if birthday_month == start_month else True) and \
-                    (birthday_day <= end_day if birthday_month == end_month else True):
+        # 處理跨年星座（如摩羯座）
+        else:
+            if (birthday_month > start_month or birthday_month < end_month) or \
+               (birthday_month == start_month and birthday_day >= start_day) or \
+               (birthday_month == end_month and birthday_day <= end_day):
                 user_zodiac = zodiac
                 break
-    
+
     if user_zodiac:
         print(f"User zodiac found: {user_zodiac}")
         shingzuoyunshi = get_horoscope()
