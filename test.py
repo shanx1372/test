@@ -132,10 +132,10 @@ def handle_message(event):
         if user_id in user_horoscope_dict and user_horoscope_dict[user_id]['birthday']==(birthday_month,birthday_day):
             # 如果運勢已經存在且生日相同，回覆之前的運勢
             horoscope=user_horoscope_dict[user_id]
-            response_message=f"您的星座是:{horoscope['zodiac']}\n"
-            response_message+=f"事業運勢:{horoscope['career']}\n"
-            response_message+=f"感情運勢:{horoscope['love']}\n"
-            response_message+=f"財運運勢:{horoscope['wealth']}\n"
+            response_message=f"您的星座是:{user_zodiac}\n"
+            response_message+=f"事業運勢:{horoscope['career_coss']}分-{horoscope['career']}\n"
+            response_message+=f"感情運勢:{horoscope['love_coss']}分-{horoscope['love']}\n"
+            response_message+=f"財運運勢:{horoscope['wealth_coss']}分-{horoscope['wealth']}\n"
             response_message+=f"今天總體運勢:{horoscope['total_point']}"
             line_bot_api.reply_message(event.reply_token,TextSendMessage(text=response_message))
             print(f"Sending cached response:{response_message}")
