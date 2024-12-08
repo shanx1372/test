@@ -30,7 +30,7 @@ Constellation_date = {
 
 # 根據用戶生日計算固定運勢
 def get_fixed_horoscope(birthday_month, birthday_day):
-    # 使用生日的月日組合生成一個固定的哈希值
+    # 使用生日的月日組合生成一個固定的哈希值，這樣可以保證每個生日得到固定的運勢
     hash_value = hash((birthday_month, birthday_day)) % 10  # 使用hash並對10取餘數，保證在1到10之間
 
     career_point = {
