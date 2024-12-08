@@ -88,7 +88,7 @@ def get_horoscope_by_birthday(birthday_month,birthday_day):
 def callback():
     call_noise=request.headers["X-Line-Signature"]
     set_noise=request.get_data(as_text=True)
-    print(f"Received body:{set_noise}")
+    
     try:
         handler.handle(set_noise,call_noise)
     except Exception as e:
