@@ -39,7 +39,7 @@ def get_horoscope_by_birthday(birthday_month,birthday_day):
     love_coss=random.randint(1,10)
     wealth_coss=random.randint(1,10)
 
-    career_point={
+    point={
         1:"大凶",
         2:"大凶",
         3:"凶。",
@@ -51,8 +51,11 @@ def get_horoscope_by_birthday(birthday_month,birthday_day):
         9:"大吉",
         10:"大吉"
     }
+
+    love_point=point
+    wealth_point=point
     
-    career=career_point[career_coss]
+    career=point[career_coss]
     love=love_point[love_coss]
     wealth=wealth_point[wealth_coss]
 
