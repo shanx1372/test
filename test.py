@@ -6,14 +6,14 @@ import hashlib
 
 app=Flask(__name__)
 
-# 設定 LineBot API
+#設定LineBot API
 line_bot_api=LineBotApi("HeY7xErJxPUD2+UrUyfikjhpi5XsB6rykrc06AwGheydfuCkjQQ6IjbJi60g/WamRk2DHX+0Sk18MLKwD1+anucjjVDDdjSHK4EfMNqv/Tn4eCOn2/zsy0heZod+FqdbAhiXoI95VuoBSnbsKKmvAgdB04t89/1O/w1cDnyilFU=")
 handler=WebhookHandler("84678552c0bbd4a3026ee16c8cb8d4a7")
 
-# 儲存用戶的生日與運勢結果
+#儲存使用者的生日與運勢結果
 user_horoscope_dict={}
 
-# 星座日期對應（包含跨年處理）
+#星座日期對應
 Constellation_date={
     "牡羊座":((3,21),(4,19)),
     "金牛座":((4,20),(5,20)),
@@ -24,16 +24,16 @@ Constellation_date={
     "天秤座":((9,23),(10,22)),
     "天蠍座":((10,23),(11,21)),
     "射手座":((11,22),(12,21)),
-    "摩羯座":((12,22),(1,19)),  # 跨年處理
+    "摩羯座":((12,22),(1,19)),  
     "水瓶座":((1,20),(2,18)),
     "雙魚座":((2,19),(3,20)),
 }
 
-# 星座運勢生成（根據生日固定生成結果）
+#星座運勢產生（根據生日固定日期產生結果）
 def get_horoscope_by_birthday(birthday_month,birthday_day):
-    # 以生日作為種子生成固定的隨機數
-    seed=f"{birthday_month}/{birthday_day}"
-    random.seed(hashlib.md5(seed.encode('utf-8')).hexdigest())  # 使用生日作為種子生成隨機數
+    #以生日為主產生固定的隨機數
+    seed_day=f"{birthday_month}/{birthday_day}"
+    random.seed(hashlib.md5(seed_day.encode('utf-8')).hexdigest())
 
     career_coss=random.randint(1,10)
     love_coss=random.randint(1,10)
@@ -78,7 +78,7 @@ def get_horoscope_by_birthday(birthday_month,birthday_day):
         "total_point":total_point
     }
 
-# 處理回調函數
+#處理回調函數
 @app.route("/callback",methods=["POST"])
 def callback():
     signature=request.headers["X-Line-Signature"]
@@ -95,31 +95,31 @@ def callback():
 def handle_message(event):
     print("收到訊息:",event.message.text)
     user_message=event.message.text
-    user_id=event.source.user_id  # 提取用戶的 user_id
+    user_id=event.source.user_id #提取用戶的user_id
 
     try:
         birthday_month,birthday_day=map(int,user_message.split("/"))
-        print(f"您的生日是:{birthday_month}/{birthday_day}")  # 確認生日解析結果
+        print(f"您的生日是:{birthday_month}/{birthday_day}") #確認生日分析結果
     except ValueError:
-        # 如果格式錯誤，回覆提示訊息
+        #如果輸入格式錯誤，回覆提示訊息
         line_bot_api.reply_message(event.reply_token,TextSendMessage(text="請輸入正確的生日格式 (MM/DD)，例如 08/15"))
         return
 
     user_zodiac=None
 
-    # 星座匹配邏輯
+    #星座識別邏輯
     for zodiac,(start,end) in Constellation_date.items():
         start_month,start_day=start
         end_month,end_day=end
 
-        # 處理跨年星座邏輯
-        if start_month<end_month:  # 當星座的開始月份小於結束月份（如金牛座 4/20 - 5/20）
+        #處理跨年星座邏輯
+        if start_month<end_month:
             if (start_month<birthday_month < end_month) or\
                (birthday_month==start_month and birthday_day>=start_day) or\
                (birthday_month==end_month and birthday_day<=end_day):
                 user_zodiac=zodiac
                 break
-        else:  # 處理跨年的星座（如摩羯座 12/22 - 1/19）
+        else:  
             if (birthday_month>start_month or (birthday_month==start_month and birthday_day>=start_day)) or\
                (birthday_month<end_month or (birthday_month==end_month and birthday_day<=end_day)):
                 user_zodiac=zodiac
@@ -128,9 +128,9 @@ def handle_message(event):
     if user_zodiac:
         print(f"User zodiac found:{user_zodiac}")
         
-        # 檢查該 user_id 是否已有存儲過的運勢結果
+        #檢查該user_id是否有存儲過運勢結果
         if user_id in user_horoscope_dict and user_horoscope_dict[user_id]['birthday']==(birthday_month,birthday_day):
-            # 如果運勢已經存在且生日相同，回覆之前的運勢
+            #如果運勢已經存在且生日相同，回覆之前的運勢
             horoscope=user_horoscope_dict[user_id]
             response_message=f"您的星座是:{user_zodiac}\n"
             response_message+=f"事業運勢:{horoscope['career_coss']}分-{horoscope['career']}\n"
@@ -140,7 +140,7 @@ def handle_message(event):
             line_bot_api.reply_message(event.reply_token,TextSendMessage(text=response_message))
             print(f"Sending cached response:{response_message}")
         else:
-            # 重新計算運勢並儲存固定結果
+            #重新計算運勢並儲存固定結果
             horoscope=get_horoscope_by_birthday(birthday_month,birthday_day)
             response_message=f"您的星座是:{user_zodiac}\n"
             response_message+=f"事業運勢:{horoscope['career_coss']}分-{horoscope['career']}\n"
@@ -148,7 +148,7 @@ def handle_message(event):
             response_message+=f"財運運勢:{horoscope['wealth_coss']}分-{horoscope['wealth']}\n"
             response_message+=f"今天總體運勢:{horoscope['total_point']}"
 
-            # 儲存新的運勢結果
+            #儲存新的運勢結果
             horoscope["zodiac"]=user_zodiac
             horoscope["birthday"]=(birthday_month,birthday_day)
             user_horoscope_dict[user_id]=horoscope
