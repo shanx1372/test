@@ -52,12 +52,11 @@ def get_horoscope_by_birthday(birthday_month,birthday_day):
         10:"大吉"
     }
 
-    love_point=point
-    wealth_point=point
+    
     
     career=point[career_coss]
-    love=love_point[love_coss]
-    wealth=wealth_point[wealth_coss]
+    love=point[love_coss]
+    wealth=point[wealth_coss]
 
     total_coss=(career_coss+love_coss+wealth_coss)//3
     if total_coss<=3:
