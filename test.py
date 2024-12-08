@@ -25,11 +25,11 @@ Constellation_date={
     "雙魚座":((2,19),(3,20)),
 }
 
+user_horoscope_dict={}
+
 # 星座運勢
-def get_horoscope():
-    career_coss=random.randint(1,10)
-    love_coss=random.randint(1,10)
-    wealth_coss=random.randint(1,10)
+def get_horoscope(birthday_month,birthday_day):
+    hash_value=hash((birthday_month,birthday_day))%10
 
     career_point={
         1:"大凶",
@@ -44,14 +44,11 @@ def get_horoscope():
         10:"大吉"
     }
 
-    love_point=career_point
-    wealth_point=career_point
-    
-    career=career_point[career_coss]
-    love=love_point[love_coss]
-    wealth=wealth_point[wealth_coss]
+    career = career_point[hash_value]
+    love = career_point[(hash_value + 1) % 10]  # 確保感情運勢與事業不同
+    wealth = career_point[(hash_value + 2) % 10]  # 確保財運運勢與事業和感情不同
 
-    total_coss=(career_coss + love_coss + wealth_coss)//3
+    total_coss=(hash_value+(hash_value+1)%10+(hash_value+2)%10)//3
     if total_coss<=3:
         total_point="您今天的運勢是很差的，一言難盡。"
     elif total_coss<=7:
@@ -60,13 +57,9 @@ def get_horoscope():
         total_point="您今天的運勢超棒的，無所畏懼！勇往直前！！！"        
 
     return {
-        "career_coss":career_coss,
-        "love_coss":love_coss,
-        "wealth_coss":wealth_coss,
-        "career":career,
-        "love":love,
-        "wealth":wealth,
-        "total_coss":total_coss,
+        "career_coss":career,
+        "love_coss":love,
+        "wealth_coss":wealth,
         "total_point":total_point
     }
 
@@ -87,6 +80,18 @@ def callback():
 def handle_message(event):
     print("收到訊息:",event.message.text)
     user_message=event.message.text
+    user_id=event.source.use_id
+
+    if user_id in user_horoscope_dict:
+        horscope=user_horoscope_dict[user_id]
+        response_message=f"您的星座是:{horoscope['zodiac']}\n"
+        response_message+=f"事業運勢:{horoscope['career']}\n"
+        response_message+=f"感情運勢:{horoscope['love']}\n"
+        response_message+=f"財運運勢:{horoscope['wealth']}\n"
+        response_message+=f"今天總體運勢:{horoscope['total_point']}"
+        line_bot_api.reply_message(event.reply_token,TextSendMessage(text=response_message))
+        print(f"Sending response(cached):{response_message}")
+        return
 
     try:
         birthday_month,birthday_day=map(int,user_message.split("/"))
@@ -118,12 +123,15 @@ def handle_message(event):
 
     if user_zodiac:
         print(f"User zodiac found:{user_zodiac}")
-        horoscope=get_horoscope()
+        horoscope=get_horoscope(birthday_month,birthday_day)
+        horoscope["zodiac"]=user_zodiac
+
+        user_horoscope_dict[user_id]=horoscope
 
         response_message=f"您的星座是:{user_zodiac}\n"
-        response_message+=f"事業運勢:{horoscope['career_coss']}分-{horoscope['career']}\n"
-        response_message+=f"感情運勢:{horoscope['love_coss']}分-{horoscope['love']}\n"
-        response_message+=f"財運運勢:{horoscope['wealth_coss']}分-{horoscope['wealth']}\n"
+        response_message+=f"事業運勢:{horoscope['career']}\n"
+        response_message+=f"感情運勢:{horoscope['love']}\n"
+        response_message+=f"財運運勢:{horoscope['wealth']}\n"
         response_message+=f"今天總體運勢:{horoscope['total_point']}"
 
         line_bot_api.reply_message(event.reply_token,TextSendMessage(text=response_message))
