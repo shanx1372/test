@@ -87,10 +87,10 @@ def get_horoscope_by_birthday(birthday_month,birthday_day):
 @app.route("/callback",methods=["POST"])
 def callback():
     call_noise=request.headers["X-Line-Signature"]
-    body=request.get_data(as_text=True)
-    print(f"Received body:{body}")
+    set_noise=request.get_data(as_text=True)
+    print(f"Received body:{set_noise}")
     try:
-        handler.handle(body,call_noise)
+        handler.handle(set_noise,call_noise)
     except Exception as e:
         print(f"Error handling the request:{e}")
         abort(400)
