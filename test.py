@@ -2,6 +2,7 @@ from flask import Flask, request, abort
 from linebot import LineBotApi, WebhookHandler
 from linebot.models import MessageEvent, TextMessage, TextSendMessage
 import random
+import hashlib
 
 app = Flask(__name__)
 
@@ -28,8 +29,12 @@ Constellation_date = {
     "雙魚座": ((2, 19), (3, 20)),
 }
 
-# 星座運勢生成
-def get_horoscope():
+# 星座運勢生成（根據生日固定生成結果）
+def get_horoscope_by_birthday(birthday_month, birthday_day):
+    # 以生日作為種子生成固定的隨機數
+    seed = f"{birthday_month}/{birthday_day}"
+    random.seed(hashlib.md5(seed.encode('utf-8')).hexdigest())  # 使用生日作為種子生成隨機數
+
     career_coss = random.randint(1, 10)
     love_coss = random.randint(1, 10)
     wealth_coss = random.randint(1, 10)
@@ -135,8 +140,8 @@ def handle_message(event):
             line_bot_api.reply_message(event.reply_token, TextSendMessage(text=response_message))
             print(f"Sending cached response:{response_message}")
         else:
-            # 重新計算運勢
-            horoscope = get_horoscope()
+            # 重新計算運勢並儲存固定結果
+            horoscope = get_horoscope_by_birthday(birthday_month, birthday_day)
             response_message = f"您的星座是:{user_zodiac}\n"
             response_message += f"事業運勢:{horoscope['career_coss']}分-{horoscope['career']}\n"
             response_message += f"感情運勢:{horoscope['love_coss']}分-{horoscope['love']}\n"
