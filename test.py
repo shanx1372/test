@@ -51,9 +51,6 @@ def get_horoscope_by_birthday(birthday_month,birthday_day):
         9:"大吉",
         10:"大吉"
     }
-
-    love_point=career_point
-    wealth_point=career_point
     
     career=career_point[career_coss]
     love=love_point[love_coss]
