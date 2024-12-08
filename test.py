@@ -15,7 +15,7 @@ handler=WebhookHandler("84678552c0bbd4a3026ee16c8cb8d4a7")
 #儲存使用者的生日與運勢結果
 user_horoscope_dict={}
 
-#設定星座日期對應
+#星座日期對應
 Constellation_date={
     "牡羊座":((3,21),(4,19)),
     "金牛座":((4,20),(5,20)),
@@ -56,22 +56,21 @@ def get_horoscope_by_birthday(birthday_month,birthday_day):
         9:"大吉",
         10:"大吉"
     }
+
     
-    #輸出占卜結果
-    career=point[career_coss]#事業運勢
-    love=point[love_coss]#感情運勢
-    wealth=point[wealth_coss]#財運運勢
+    
+    career=point[career_coss]
+    love=point[love_coss]
+    wealth=point[wealth_coss]
 
-    total_coss=(career_coss+love_coss+wealth_coss)//3#占卜總分與評價
-
+    total_coss=(career_coss+love_coss+wealth_coss)//3
     if total_coss<=3:
         total_point="您今天的運勢是很差的，一言難盡。"
     elif total_coss<=7:
         total_point="您今天的運勢是良好，可保持平常心。"
     else:
         total_point="您今天的運勢超棒的，無所畏懼！勇往直前！！！"        
-    
-    #輸出占卜結果
+
     return {
         "career_coss":career_coss,
         "love_coss":love_coss,
@@ -86,11 +85,11 @@ def get_horoscope_by_birthday(birthday_month,birthday_day):
 #處理回調函數
 @app.route("/callback",methods=["POST"])
 def callback():
-    call_noise=request.headers["X-Line-Signature"]
-    set_noise=request.get_data(as_text=True)
-    
+    signature=request.headers["X-Line-Signature"]
+    body=request.get_data(as_text=True)
+    print(f"Received body:{body}")
     try:
-        handler.handle(set_noise,call_noise)
+        handler.handle(body,signature)
     except Exception as e:
         print(f"Error handling the request:{e}")
         abort(400)
