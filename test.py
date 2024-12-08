@@ -9,7 +9,7 @@ app = Flask(__name__)
 line_bot_api = LineBotApi("HeY7xErJxPUD2+UrUyfikjhpi5XsB6rykrc06AwGheydfuCkjQQ6IjbJi60g/WamRk2DHX+0Sk18MLKwD1+anucjjVDDdjSHK4EfMNqv/Tn4eCOn2/zsy0heZod+FqdbAhiXoI95VuoBSnbsKKmvAgdB04t89/1O/w1cDnyilFU=")
 handler = WebhookHandler("84678552c0bbd4a3026ee16c8cb8d4a7")
 
-# 儲存用戶的運勢結果
+# 儲存用戶的生日與運勢結果
 user_horoscope_dict = {}
 
 # 星座日期對應（包含跨年處理）
@@ -120,35 +120,36 @@ def handle_message(event):
                 user_zodiac = zodiac
                 break
 
-    # 檢查該 user_id 是否已有運勢結果
-    if user_id in user_horoscope_dict:
-        # 如果已有運勢結果，直接返回
-        horoscope = user_horoscope_dict[user_id]
-        response_message = f"您的星座是:{horoscope['zodiac']}\n"
-        response_message += f"事業運勢:{horoscope['career']}\n"
-        response_message += f"感情運勢:{horoscope['love']}\n"
-        response_message += f"財運運勢:{horoscope['wealth']}\n"
-        response_message += f"今天總體運勢:{horoscope['total_point']}"
-        line_bot_api.reply_message(event.reply_token, TextSendMessage(text=response_message))
-        print(f"Sending response (cached):{response_message}")
-        return
-
     if user_zodiac:
         print(f"User zodiac found:{user_zodiac}")
-        horoscope = get_horoscope()
+        
+        # 檢查該 user_id 是否已有存儲過的運勢結果
+        if user_id in user_horoscope_dict and user_horoscope_dict[user_id]['birthday'] == (birthday_month, birthday_day):
+            # 如果運勢已經存在且生日相同，回覆之前的運勢
+            horoscope = user_horoscope_dict[user_id]
+            response_message = f"您的星座是:{horoscope['zodiac']}\n"
+            response_message += f"事業運勢:{horoscope['career']}\n"
+            response_message += f"感情運勢:{horoscope['love']}\n"
+            response_message += f"財運運勢:{horoscope['wealth']}\n"
+            response_message += f"今天總體運勢:{horoscope['total_point']}"
+            line_bot_api.reply_message(event.reply_token, TextSendMessage(text=response_message))
+            print(f"Sending cached response:{response_message}")
+        else:
+            # 重新計算運勢
+            horoscope = get_horoscope()
+            response_message = f"您的星座是:{user_zodiac}\n"
+            response_message += f"事業運勢:{horoscope['career_coss']}分-{horoscope['career']}\n"
+            response_message += f"感情運勢:{horoscope['love_coss']}分-{horoscope['love']}\n"
+            response_message += f"財運運勢:{horoscope['wealth_coss']}分-{horoscope['wealth']}\n"
+            response_message += f"今天總體運勢:{horoscope['total_point']}"
 
-        response_message = f"您的星座是:{user_zodiac}\n"
-        response_message += f"事業運勢:{horoscope['career_coss']}分-{horoscope['career']}\n"
-        response_message += f"感情運勢:{horoscope['love_coss']}分-{horoscope['love']}\n"
-        response_message += f"財運運勢:{horoscope['wealth_coss']}分-{horoscope['wealth']}\n"
-        response_message += f"今天總體運勢:{horoscope['total_point']}"
+            # 儲存新的運勢結果
+            horoscope["zodiac"] = user_zodiac
+            horoscope["birthday"] = (birthday_month, birthday_day)
+            user_horoscope_dict[user_id] = horoscope
 
-        # 將結果存入字典
-        horoscope["zodiac"] = user_zodiac
-        user_horoscope_dict[user_id] = horoscope
-
-        line_bot_api.reply_message(event.reply_token, TextSendMessage(text=response_message))
-        print(f"Sending response (new):{response_message}")
+            line_bot_api.reply_message(event.reply_token, TextSendMessage(text=response_message))
+            print(f"Sending new response:{response_message}")
     else:
         print("Zodiac not found")
         line_bot_api.reply_message(event.reply_token, TextSendMessage(text="您輸入的星座無法識別，請檢查日期"))
