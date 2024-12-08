@@ -32,16 +32,16 @@ def get_horoscope():
     wealth_coss=random.randint(1,10)
 
     career_point={
-        1:"您今天的運勢是很差的，一言難盡。",
-        2:"您今天的運勢是不好的，請步步為營！",
-        3:"您今天的運勢是不太好的，不適合做太難的任務。",
-        4:"您今天的運勢是稍差，但不用太擔心，保持平常心就好。",
-        5:"您今天的運勢是尚可，不用太過擔心。",
-        6:"您今天的運勢是良好，不要做太勉強自己的事情。",
-        7:"您今天的運勢是優良，只要小心謹慎，就能完成工作。",
-        8:"您今天的運勢是很不錯，請繼續加油，突破困難！！！",
-        9:"您今天的運勢是很棒的，不論做什麼事情都沒有問題！",
-        10:"您今天的運勢超棒的，無所畏懼！勇往直前！！！"
+        1:"大凶",
+        2:"大凶",
+        3:"凶。",
+        4:"凶。",
+        5:"良好",
+        6:"良好",
+        7:"優良",
+        8:"優良",
+        9:"大吉",
+        10:"大吉"
     }
 
     love_point=career_point
@@ -53,11 +53,11 @@ def get_horoscope():
 
     total_coss=(career_coss + love_coss + wealth_coss)//3
     if total_coss<=3:
-        total_point="凶"
+        total_point="您今天的運勢是很差的，一言難盡。"
     elif total_coss<=7:
-        total_point="吉"
+        total_point="您今天的運勢是良好，可保持平常心。"
     else:
-        total_point="大吉"        
+        total_point="您今天的運勢超棒的，無所畏懼！勇往直前！！！"        
 
     return {
         "career_coss":career_coss,
